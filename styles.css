@@ -165,6 +165,10 @@ body:not(.native-scrollbars) #sr-modal .modal-close-button {
     background-color: #ff7043 !important;
 }
 
+.sr-bg-orange {
+    background-color: #ff9800 !important;
+}
+
 .sr-deck-list .sr-tree-item-row:hover .sr-bg-green,
 .sr-response-button.sr-bg-green:hover {
     background-color: hsl(122, 39%, 44%) !important;

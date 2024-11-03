@@ -43,6 +43,7 @@ export class FlashcardReviewView {
     public context: HTMLElement;
 
     public response: HTMLDivElement;
+    public againButton: HTMLButtonElement;
     public hardButton: HTMLButtonElement;
     public goodButton: HTMLButtonElement;
     public easyButton: HTMLButtonElement;
@@ -91,7 +92,7 @@ export class FlashcardReviewView {
 
         this.view = this.modalContentEl.createDiv();
         this.view.addClasses(["sr-flashcard", "sr-is-hidden"]);
-
+        
         this.header = this.view.createDiv();
         this.header.addClass("sr-header");
 
@@ -103,6 +104,7 @@ export class FlashcardReviewView {
 
         this.subTitle = this.titleWrapper.createDiv();
         this.subTitle.addClasses(["sr-sub-title", "sr-is-hidden"]);
+
 
         this.controls = this.header.createDiv();
         this.controls.addClass("sr-controls");
@@ -340,15 +342,22 @@ export class FlashcardReviewView {
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
+        this.againButton.removeClass("sr-is-hidden");
         this.hardButton.removeClass("sr-is-hidden");
         this.easyButton.removeClass("sr-is-hidden");
 
         if (this.reviewMode === FlashcardReviewMode.Cram) {
             this.response.addClass("is-cram");
+            this.againButton.setText(`${this.settings.flashcardAgainText}`);
             this.hardButton.setText(`${this.settings.flashcardHardText}`);
             this.easyButton.setText(`${this.settings.flashcardEasyText}`);
         } else {
             this.goodButton.removeClass("sr-is-hidden");
+            this._setupEaseButton(
+                this.againButton,
+                this.settings.flashcardAgainText,
+                ReviewResponse.Again,
+            );
             this._setupEaseButton(
                 this.hardButton,
                 this.settings.flashcardHardText,
@@ -511,6 +520,7 @@ export class FlashcardReviewView {
 
     private _createResponseButtons() {
         this._createShowAnswerButton();
+        this._createAgainButton();
         this._createHardButton();
         this._createGoodButton();
         this._createEasyButton();
@@ -519,6 +529,7 @@ export class FlashcardReviewView {
     private _resetResponseButtons() {
         // Sets all buttons in to their default state
         this.answerButton.removeClass("sr-is-hidden");
+        this.againButton.addClass("sr-is-hidden");
         this.hardButton.addClass("sr-is-hidden");
         this.goodButton.addClass("sr-is-hidden");
         this.easyButton.addClass("sr-is-hidden");
@@ -533,12 +544,26 @@ export class FlashcardReviewView {
         });
     }
 
+    private _createAgainButton() {
+        this.againButton = this.response.createEl("button");
+        this.againButton.addClasses([
+            "sr-response-button",
+            "sr-again-button",
+            "sr-bg-red",
+            "sr-is-hidden",
+        ]);
+        this.againButton.setText(this.settings.flashcardAgainText);
+        this.againButton.addEventListener("click", () => {
+            this._processReview(ReviewResponse.Again);
+        });
+    }
+
     private _createHardButton() {
         this.hardButton = this.response.createEl("button");
         this.hardButton.addClasses([
             "sr-response-button",
             "sr-hard-button",
-            "sr-bg-red",
+            "sr-bg-orange",
             "sr-is-hidden",
         ]);
         this.hardButton.setText(this.settings.flashcardHardText);
@@ -552,7 +577,7 @@ export class FlashcardReviewView {
         this.goodButton.addClasses([
             "sr-response-button",
             "sr-good-button",
-            "sr-bg-blue",
+            "sr-bg-green",
             "sr-is-hidden",
         ]);
         this.goodButton.setText(this.settings.flashcardGoodText);
@@ -566,7 +591,7 @@ export class FlashcardReviewView {
         this.easyButton.addClasses([
             "sr-response-button",
             "sr-hard-button",
-            "sr-bg-green",
+            "sr-bg-blue",
             "sr-is-hidden",
         ]);
         this.easyButton.setText(this.settings.flashcardEasyText);

@@ -31,11 +31,18 @@ export function osrSchedule(
             1,
             (interval + delayedBeforeReviewDays / 4) * settings.lapsesIntervalChange,
         );
+    } else if (response === ReviewResponse.Again) {
+        // If the card was forgotten, decrease the ease and the interval
+        ease = -1;  //Math.max(130, ease - 30); // Decrease ease more than for 'Hard'
+        // Minimum interval is 10 minutes
+        interval = 10 / (24 * 60);
+        console.log("interval", interval);
     }
 
     // replaces random fuzz with load balancing over the fuzz interval
     if (settings.loadBalance && dueDateHistogram !== undefined) {
-        interval = Math.round(interval);
+        // Don't round if less than a day
+        interval = interval > 1 ? Math.round(interval) : interval;
         // disable fuzzing for small intervals
         if (interval > 7) {
             let fuzz: number;
@@ -51,7 +58,8 @@ export function osrSchedule(
     }
 
     interval = Math.min(interval, settings.maximumInterval);
-    interval = Math.round(interval * 10) / 10;
+    // Round to 3 decimal places (e.g. 10 minutes = 0.0069 days). <-- This is a bit of a hack. Use minutes instead of days.
+    interval = Math.round(interval * 1000) / 1000;
 
     return { interval, ease };
 }

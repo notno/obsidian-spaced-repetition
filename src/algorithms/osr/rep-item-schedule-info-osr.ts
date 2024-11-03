@@ -22,7 +22,7 @@ export class RepItemScheduleInfoOsr extends RepItemScheduleInfo {
     ) {
         super();
         this.dueDate = dueDate;
-        this.interval = Math.round(interval);
+        this.interval = interval >= 1 ? Math.round(interval) : interval;
         this.latestEase = latestEase;
         this.delayedBeforeReviewTicks = delayedBeforeReviewTicks;
         if (dueDate && delayedBeforeReviewTicks == null) {

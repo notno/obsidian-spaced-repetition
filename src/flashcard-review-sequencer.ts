@@ -151,7 +151,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
             const oldSchedule = this.currentCard.scheduleInfo;
 
             // We need to update the schedule if:
-            //  (1) the user reviewed with easy/good/hard (either a new or due card),
+            //  (1) the user reviewed with easy/good/hard/again (either a new or due card),
             //  (2) or reset a due card
             // Nothing to do if a user resets a new card
             this.currentCard.scheduleInfo = this.determineCardSchedule(response, this.currentCard);

@@ -53,6 +53,8 @@ export class DueDateHistogram {
 
     increment(days: number): void {
         let value: number = 0;
+        // Force all intervals to be at least 1 day for histogram
+        days = Math.max(days, 1);
         if (this.dueDatesMap.has(days)) {
             value = this.dueDatesMap.get(days);
         }
