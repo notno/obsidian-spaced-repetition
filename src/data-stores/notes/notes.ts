@@ -49,6 +49,7 @@ export class StoreInNotes implements IDataStore {
             }
             result.push(info);
         }
+        // debugger;
         return result;
     }
 

@@ -753,6 +753,30 @@ export class SRSettingTab extends PluginSettingTab {
             });
 
         new Setting(containerEl)
+            .setName(t("FLASHCARD_FORGOTTEN_LABEL"))
+            .setDesc(t("FLASHCARD_FORGOTTEN_DESC"))
+            .addText((text) =>
+                text.setValue(this.plugin.data.settings.flashcardForgottenText).onChange((value) => {
+                    applySettingsUpdate(async () => {
+                        this.plugin.data.settings.flashcardForgottenText = value;
+                        await this.plugin.savePluginData();
+                    });
+                }),
+            )
+            .addExtraButton((button) => {
+                button
+                    .setIcon("reset")
+                    .setTooltip(t("RESET_DEFAULT"))
+                    .onClick(async () => {
+                        this.plugin.data.settings.flashcardForgottenText =
+                            DEFAULT_SETTINGS.flashcardForgottenText;
+                        await this.plugin.savePluginData();
+
+                        this.display();
+                    });
+            });
+
+        new Setting(containerEl)
             .setName(t("REVIEW_BUTTON_DELAY"))
             .setDesc(t("REVIEW_BUTTON_DELAY_DESC"))
             .addSlider((slider) =>

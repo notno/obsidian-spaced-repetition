@@ -18,7 +18,9 @@ export function osrSchedule(
 ): Record<string, number> {
     const delayedBeforeReviewDays = Math.max(0, Math.floor(delayedBeforeReview / TICKS_PER_DAY));
     let interval: number = originalInterval;
-
+    const forgotten: boolean = ease < 0;
+    // If the card was previously forgotten (ease is negative), reset the ease.
+    ease = Math.abs(ease);
     if (response === ReviewResponse.Easy) {
         ease += 20;
         interval = ((interval + delayedBeforeReviewDays) * ease) / 100;
@@ -31,13 +33,16 @@ export function osrSchedule(
             1,
             (interval + delayedBeforeReviewDays / 4) * settings.lapsesIntervalChange,
         );
-    } else if (response === ReviewResponse.Again) {
+    } else if (response === ReviewResponse.Forgotten) {
         // If the card was forgotten, decrease the ease and the interval
-        ease = -1;  //Math.max(130, ease - 30); // Decrease ease more than for 'Hard'
+        ease = Math.max(130, ease - 40); // Decrease ease more than for 'Hard'
+        ease = -ease; // This is to store the state of the card as forgotten
         // Minimum interval is 10 minutes
         interval = 10 / (24 * 60);
-        console.log("interval", interval);
     }
+
+    // If the card was previously forgotten, there is a penalty to the interval
+    interval *= forgotten ? settings.lapsesIntervalChange : 1;
 
     // replaces random fuzz with load balancing over the fuzz interval
     if (settings.loadBalance && dueDateHistogram !== undefined) {

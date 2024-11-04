@@ -17,6 +17,7 @@ import { Note } from "src/note";
 import { CardType, Question } from "src/question";
 import { SRSettings } from "src/settings";
 import { RenderMarkdownWrapper } from "src/utils/renderers";
+import {PREFERRED_DATE_FORMAT} from "src/constants";
 
 export class FlashcardReviewView {
     public app: App;
@@ -43,7 +44,7 @@ export class FlashcardReviewView {
     public context: HTMLElement;
 
     public response: HTMLDivElement;
-    public againButton: HTMLButtonElement;
+    public forgottenButton: HTMLButtonElement;
     public hardButton: HTMLButtonElement;
     public goodButton: HTMLButtonElement;
     public easyButton: HTMLButtonElement;
@@ -56,6 +57,7 @@ export class FlashcardReviewView {
     private reviewMode: FlashcardReviewMode;
     private backClickHandler: () => void;
     private editClickHandler: () => void;
+    private stats: HTMLDivElement;
 
     constructor(
         app: App,
@@ -191,6 +193,12 @@ export class FlashcardReviewView {
 
         // Setup card content
         this.content.empty();
+
+        // Setup card debug stats
+        if (this.settings.debugScheduling) {
+            this._createHeaderCardStats();
+        }
+
         const wrapper: RenderMarkdownWrapper = new RenderMarkdownWrapper(
             this.app,
             this.plugin,
@@ -249,7 +257,7 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
-                this._processReview(ReviewResponse.Hard);
+                this._processReview(ReviewResponse.Forgotten);
                 consumeKeyEvent();
                 break;
             case "Numpad2":
@@ -257,11 +265,19 @@ export class FlashcardReviewView {
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
-                this._processReview(ReviewResponse.Good);
+                this._processReview(ReviewResponse.Hard);
                 consumeKeyEvent();
                 break;
             case "Numpad3":
             case "Digit3":
+                if (this.mode !== FlashcardModalMode.Back) {
+                    break;
+                }
+                this._processReview(ReviewResponse.Good);
+                consumeKeyEvent();
+                break;
+            case "Numpad4":
+            case "Digit4":
                 if (this.mode !== FlashcardModalMode.Back) {
                     break;
                 }
@@ -342,21 +358,21 @@ export class FlashcardReviewView {
 
         // Show response buttons
         this.answerButton.addClass("sr-is-hidden");
-        this.againButton.removeClass("sr-is-hidden");
+        this.forgottenButton.removeClass("sr-is-hidden");
         this.hardButton.removeClass("sr-is-hidden");
         this.easyButton.removeClass("sr-is-hidden");
 
         if (this.reviewMode === FlashcardReviewMode.Cram) {
             this.response.addClass("is-cram");
-            this.againButton.setText(`${this.settings.flashcardAgainText}`);
+            this.forgottenButton.setText(`${this.settings.flashcardForgottenText}`);
             this.hardButton.setText(`${this.settings.flashcardHardText}`);
             this.easyButton.setText(`${this.settings.flashcardEasyText}`);
         } else {
             this.goodButton.removeClass("sr-is-hidden");
             this._setupEaseButton(
-                this.againButton,
-                this.settings.flashcardAgainText,
-                ReviewResponse.Again,
+                this.forgottenButton,
+                this.settings.flashcardForgottenText,
+                ReviewResponse.Forgotten,
             );
             this._setupEaseButton(
                 this.hardButton,
@@ -520,7 +536,7 @@ export class FlashcardReviewView {
 
     private _createResponseButtons() {
         this._createShowAnswerButton();
-        this._createAgainButton();
+        this._createForgottenButton();
         this._createHardButton();
         this._createGoodButton();
         this._createEasyButton();
@@ -529,7 +545,7 @@ export class FlashcardReviewView {
     private _resetResponseButtons() {
         // Sets all buttons in to their default state
         this.answerButton.removeClass("sr-is-hidden");
-        this.againButton.addClass("sr-is-hidden");
+        this.forgottenButton.addClass("sr-is-hidden");
         this.hardButton.addClass("sr-is-hidden");
         this.goodButton.addClass("sr-is-hidden");
         this.easyButton.addClass("sr-is-hidden");
@@ -544,17 +560,17 @@ export class FlashcardReviewView {
         });
     }
 
-    private _createAgainButton() {
-        this.againButton = this.response.createEl("button");
-        this.againButton.addClasses([
+    private _createForgottenButton() {
+        this.forgottenButton = this.response.createEl("button");
+        this.forgottenButton.addClasses([
             "sr-response-button",
-            "sr-again-button",
+            "sr-forgotten-button",
             "sr-bg-red",
             "sr-is-hidden",
         ]);
-        this.againButton.setText(this.settings.flashcardAgainText);
-        this.againButton.addEventListener("click", () => {
-            this._processReview(ReviewResponse.Again);
+        this.forgottenButton.setText(this.settings.flashcardForgottenText);
+        this.forgottenButton.addEventListener("click", () => {
+            this._processReview(ReviewResponse.Forgotten);
         });
     }
 
@@ -620,5 +636,23 @@ export class FlashcardReviewView {
         } else {
             button.setText(buttonName);
         }
+    }
+
+    private _createHeaderCardStats() {
+        // Create the debug header for stats about this card: ease and interval
+        // This is only shown if the debugScheduling setting is enabled
+        // Get the ease and interval of the current card
+        // eslint-disable-next-line no-debugger
+        // debugger;
+        // We want a div to show the ease and interval of the current card
+        this.stats = this.context.createDiv();
+        this.stats.addClass("sr--stats-container");
+        const schedule = this._currentCard.scheduleInfo;
+        // Get previous due date and format string
+        const previousDueDate = schedule?.dueDate.format(PREFERRED_DATE_FORMAT) ?? 0;
+        const currentEaseStr = schedule?.latestEase ?? t("NEW");
+        const currentIntervalStr = textInterval(schedule?.interval, false);
+        // Set the text of the header
+        this.stats.setText(`DEBUG: ${previousDueDate} | ${currentEaseStr} | ${currentIntervalStr}`);
     }
 }

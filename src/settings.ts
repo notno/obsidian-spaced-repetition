@@ -7,6 +7,7 @@ import { pathMatchesPattern } from "src/utils/fs";
 
 export interface SRSettings {
     // flashcards
+    debugScheduling: boolean;
     flashcardTags: string[];
     convertFoldersToDecks: boolean;
     burySiblingCards: boolean;
@@ -44,7 +45,7 @@ export interface SRSettings {
     flashcardEasyText: string;
     flashcardGoodText: string;
     flashcardHardText: string;
-    flashcardAgainText: string;
+    flashcardForgottenText: string;
     reviewButtonDelay: number;
 
     // algorithm
@@ -67,6 +68,7 @@ export interface SRSettings {
 
 export const DEFAULT_SETTINGS: SRSettings = {
     // flashcards
+    debugScheduling: false,
     flashcardTags: ["#flashcards"],
     convertFoldersToDecks: false,
     burySiblingCards: false,
@@ -104,7 +106,7 @@ export const DEFAULT_SETTINGS: SRSettings = {
     flashcardEasyText: t("EASY"),
     flashcardGoodText: t("GOOD"),
     flashcardHardText: t("HARD"),
-    flashcardAgainText: t("AGAIN"),
+    flashcardForgottenText: t("FORGOTTEN"),
     reviewButtonDelay: 0,
 
     // algorithm

@@ -258,7 +258,6 @@ export class OsrAppCore extends OsrCore {
                 if (SettingsUtil.isPathInNoteIgnoreFolder(this.settings, noteFile.path)) {
                     continue;
                 }
-
                 const file: SrTFile = this.createSrTFile(noteFile);
                 await this.processFile(file);
             }

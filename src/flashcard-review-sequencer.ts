@@ -1,18 +1,18 @@
-import { ISrsAlgorithm } from "src/algorithms/base/isrs-algorithm";
-import { RepItemScheduleInfo } from "src/algorithms/base/rep-item-schedule-info";
-import { ReviewResponse } from "src/algorithms/base/repetition-item";
-import { Card } from "src/card";
-import { TICKS_PER_DAY } from "src/constants";
-import { DataStore } from "src/data-stores/base/data-store";
-import { CardListType, Deck } from "src/deck";
-import { IDeckTreeIterator } from "src/deck-tree-iterator";
-import { DueDateHistogram } from "src/due-date-histogram";
-import { Note } from "src/note";
-import { Question, QuestionText } from "src/question";
-import { IQuestionPostponementList } from "src/question-postponement-list";
-import { SRSettings } from "src/settings";
-import { TopicPath } from "src/topic-path";
-import { globalDateProvider } from "src/utils/dates";
+import {ISrsAlgorithm} from "src/algorithms/base/isrs-algorithm";
+import {RepItemScheduleInfo} from "src/algorithms/base/rep-item-schedule-info";
+import {ReviewResponse} from "src/algorithms/base/repetition-item";
+import {Card} from "src/card";
+import {TICKS_PER_DAY} from "src/constants";
+import {DataStore} from "src/data-stores/base/data-store";
+import {CardListType, Deck} from "src/deck";
+import {IDeckTreeIterator} from "src/deck-tree-iterator";
+import {DueDateHistogram} from "src/due-date-histogram";
+import {Note} from "src/note";
+import {Question, QuestionText} from "src/question";
+import {IQuestionPostponementList} from "src/question-postponement-list";
+import {SRSettings} from "src/settings";
+import {TopicPath} from "src/topic-path";
+import {globalDateProvider} from "src/utils/dates";
 
 export interface IFlashcardReviewSequencer {
     get hasCurrentCard(): boolean;
@@ -171,7 +171,7 @@ export class FlashcardReviewSequencer implements IFlashcardReviewSequencer {
         }
 
         // Move/delete the card
-        if (response == ReviewResponse.Reset) {
+        if (response == ReviewResponse.Reset || response == ReviewResponse.Forgotten) {
             this.cardSequencer.moveCurrentCardToEndOfList();
             this.cardSequencer.nextCard();
         } else {
